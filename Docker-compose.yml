@@ -1,0 +1,50 @@
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: dockerfile.server
+    ports:
+      - 3000:3000
+    volumes:
+      - "./server:/app"
+      - "/app/node_modules"
+    command: nodemon --legacy-watch index.js
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/student_db
+      - HOST=db
+      - USER=postgres
+      - DB=course_db
+      - DB_PORT=5432
+      - SERVER_PORT=3000
+    depends_on:
+      - db
+    
+    # client: # Service สำหรับ frontend client (เช่น React/Vite)
+  #   build:
+  #     context: ./client # โฟลเดอร์ context สำหรับ build image
+  #     dockerfile: Dockerfile.client # ชื่อไฟล์ Dockerfile ที่ใช้ build image
+  #   ports:
+  #     - 5173:5173 # map port 5173 ของ host ไปยัง port 5173 ของ container (ใช้สำหรับเข้าถึง frontend จากภายนอก)
+  #   volumes:
+  #     - "./client:/app" # mount โฟลเดอร์ ./client จากเครื่อง host ไปยัง /app ใน container (hot reload ได้)
+  #     - "/app/node_modules" # สร้าง volume แยกสำหรับ node_modules เพื่อไม่ให้ทับกับของ host
+  #   environment:
+  #     - CHOKIDAR_USEPOLLING=true # ตั้งค่าให้ Chokidar (watcher ของ React/Vite) ใช้ polling (เหมาะกับ Docker)
+  #   depends_on:
+  #     - server # ให้ service นี้เริ่มหลังจาก server พร้อมใช้งาน
+
+  db:
+    image: postgres:16
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=course_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
