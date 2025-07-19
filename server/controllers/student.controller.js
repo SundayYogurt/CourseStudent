@@ -5,6 +5,7 @@ const studentController = {};
 //Create and save new student
 studentController.create = async (req, res) => {
     const { studentID, firstName, lastName, gender, birthDate, email, phone, address, nationality, yearOfStudy } = req.body;
+
     //validate data
     if (!firstName || !lastName || !gender || !email) {
         res.status(400).send({ message: "studentID, firstName, lastName, gender, and email are required!" })
@@ -29,7 +30,9 @@ studentController.create = async (req, res) => {
 // Get all students
 studentController.getAll = async (req, res) => {
     try {
-        const students = await Student.findAll();
+        const em = req.query.email
+        const condition = em ? {where:{ email:em}} : {};
+        const students = await Student.findAll(condition);
         return res.send(students);
     } catch (error) {
         return res.status(500).send({ message: error.message || "Something went wrong while fetching students." })

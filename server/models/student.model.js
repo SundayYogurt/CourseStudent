@@ -45,7 +45,7 @@ const Student = sequelize.define("student",{
     }
 })
 
-Student.sync({force: true}).then(()=>{
+Student.sync({force: false}).then(()=>{
     console.log("Table created or already exists")
 }).catch((error)=>{
     console.log("Error creating table", error)
